@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using RestSharp;
 using Websocket.Client;
 
 namespace GensouSakuya.GoCqhttp.Sdk
@@ -19,22 +20,38 @@ namespace GensouSakuya.GoCqhttp.Sdk
         }
         #endregion
 
-        private Uri _uri;
+        private bool _useSsl;
+        private string _host;
+        private int _port;
         private string _accessToken;
-        private WebsocketClient _client;
 
-        public Session(string host, int port, string accessToken, bool useSsl = false)
+        public Session(string host,
+                       int port,
+                       string accessToken,
+                       bool useSsl = false)
         {
-            var scheme = useSsl ? "wss" : "ws";
-            _uri = new Uri($"{scheme}://{host}:{port}");
+            _useSsl = useSsl;
+            _host = host;
+            _port = port;
             _accessToken = accessToken;
-            _client = new WebsocketClient(_uri);
-            _client.MessageReceived.Subscribe(async (msg) => await MessageReceived(msg));
+
+            #region websocket
+            var wsScheme = _useSsl ? "wss" : "ws";
+            _wsUri = new Uri($"{wsScheme}://{_host}:{_port}");
+            _wsClient = new WebsocketClient(_wsUri);
+            _wsClient.MessageReceived.Subscribe(async (msg) => await MessageReceived(msg));
+            #endregion
+
+            #region http
+            var httpScheme = _useSsl ? "https" : "http";
+            _httpUri = new Uri($"{httpScheme}://{_host}:{_port}");
+            _httpClient = new RestClient(_httpUri);
+            #endregion
         }
 
         public async Task ConnectAsync(CancellationToken cancellationToken = default)
         {
-            await _client.StartOrFail();
+            await WebsocketConnectAsync(cancellationToken);
         }
 
         private async Task MessageReceived(ResponseMessage msg)
@@ -49,10 +66,10 @@ namespace GensouSakuya.GoCqhttp.Sdk
 
         public async ValueTask DisposeAsync()
         {
-            if(_client != null)
+            if(_wsClient != null)
             {
-                await _client.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "closed by client");
-                _client.Dispose();
+                await _wsClient.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "closed by client");
+                _wsClient.Dispose();
             }
         }
 

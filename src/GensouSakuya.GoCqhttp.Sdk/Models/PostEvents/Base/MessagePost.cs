@@ -13,7 +13,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base
         public string? MessageType { get; set; }
 
         [JsonProperty("message_id")]
-        public string MessageId { get; set; }
+        public string? MessageId { get; set; }
 
         [JsonProperty("user_Id")]
         public long UserId { get; set; }
