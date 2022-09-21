@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.Responses.Guild
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.Responses.Guild
 {
     public class GuildMemberInfo
     {

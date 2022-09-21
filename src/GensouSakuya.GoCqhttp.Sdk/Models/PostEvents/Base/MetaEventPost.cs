@@ -1,7 +1,7 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Drivers.Events;
+﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
 using Newtonsoft.Json;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
 {
     [PostInfo("meta_event", "meta_event_type")]
     public abstract class MetaEventPost : Post

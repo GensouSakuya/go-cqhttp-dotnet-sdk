@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Drivers.Events
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events
 {
     internal class PostSubTypeAttribute : Attribute
     {

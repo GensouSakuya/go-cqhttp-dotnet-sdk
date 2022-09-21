@@ -1,10 +1,10 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Drivers.Events
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events
 {
     internal static class EventResolver
     {
@@ -52,13 +52,13 @@ namespace GensouSakuya.GoCqhttp.Sdk.Drivers.Events
             return _postEventTypeMap[postType].SubTypePropertyName;
         }
 
-        public static Post GeneratePost(string postType, string subType)
+        public static Type GetPostType(string postType, string subType)
         {
             if (!_postEventTypeMap.ContainsKey(postType))
                 throw new Exception($"unknown post type:{postType}");
             if (!_postEventTypeMap[postType].EventTypes.ContainsKey(subType))
                 throw new Exception($"unknown sub type[{subType}] of post[{postType}]");
-            return (Post)Activator.CreateInstance(_postEventTypeMap[postType].EventTypes[subType]);
+            return _postEventTypeMap[postType].EventTypes[subType];
         }
 
         private static PostSubClassInfo GetSubClassInfo(string postType)

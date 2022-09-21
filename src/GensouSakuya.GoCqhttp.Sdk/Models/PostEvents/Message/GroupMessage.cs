@@ -1,8 +1,8 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Drivers.Events;
-using GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base;
+﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base;
 using Newtonsoft.Json;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Message
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Message
 {
     [PostSubType("group")]
     public class GroupMessage : MessagePost

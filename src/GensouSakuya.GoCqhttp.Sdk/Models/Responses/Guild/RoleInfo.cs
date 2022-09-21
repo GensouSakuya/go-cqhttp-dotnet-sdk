@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.Responses.Guild
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.Responses.Guild
 {
     public class RoleInfo
     {

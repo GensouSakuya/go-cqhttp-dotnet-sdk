@@ -1,7 +1,7 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Drivers.Events;
-using GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base;
+﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Message
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Message
 {
     [PostSubType("private")]
     public class PrivateMessage : MessagePost

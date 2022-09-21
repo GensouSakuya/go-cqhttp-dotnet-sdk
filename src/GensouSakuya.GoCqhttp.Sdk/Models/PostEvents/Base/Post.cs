@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base
+namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
 {
     public abstract class Post
     {
