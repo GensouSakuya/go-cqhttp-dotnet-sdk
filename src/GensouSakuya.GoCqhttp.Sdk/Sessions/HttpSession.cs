@@ -1,6 +1,7 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Models.Responses.Guild;
+﻿using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,16 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             return Task.CompletedTask;
         }
 
+        public override Task<string> CreateGuildRole(string guildId, string color, string name, bool independent, List<string> initialUsers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task DeleteGuildRole(string guildId, string roleId)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             if (_httpClient != null)
@@ -31,7 +42,22 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             }
         }
 
-        public override async Task<GuildMemberInfo?> GetGuildMemberProfile(long guildId, long tinyId)
+        public override Task<List<ChannelInfo>?> GetGuildChannelList(string guildId, bool noCache)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<List<GuildInfo>?> GetGuildList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<List<GuildMemberInfo>> GetGuildMemberList(string guildId, string nextToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<GuildMemberInfo?> GetGuildMemberProfile(string guildId, string tinyId)
         {
             var request = new RestRequest("/get_guild_member_profile");
             request.Method = Method.Get;
@@ -40,6 +66,41 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             var response = await _httpClient.ExecuteAsync<GuildMemberInfo>(request);
             response.ThrowIfError();
             return response.Data;
+        }
+
+        public override Task<GuildGuestMeta?> GetGuildMetaByGuest(string guildId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<List<RoleInfo>> GetGuildRoles(string guildId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<GuildProfile?> GetGuildServiceProfile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<List<FeedInfo>?> GetTopicChannelFeeds(string guildId, string channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<string?> SendGuildChannelMsg(string guildId, string channelId, string msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task SetGuildMemberRole(string guildId, bool set, string roleId, List<string> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task UpdateGuildRole(string guildId, string roleId, string name, string color, bool independent)
+        {
+            throw new NotImplementedException();
         }
     }
 }
