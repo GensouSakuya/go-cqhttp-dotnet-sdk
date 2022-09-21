@@ -1,14 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models
+namespace GensouSakuya.GoCqhttp.Sdk.Models.Guild
 {
     public class ChannelInfo
     {
         [JsonProperty("owner_guild_id")]
-        public long OwnerGuildId { get; set; }
+        public string? OwnerGuildId { get; set; }
         [JsonProperty("channel_id")]
-        public long ChannelId { get; set; }
+        public string? ChannelId { get; set; }
         /// <summary>
         /// 1:文字频道;2:语音频道;5:直播频道;7:主题频道
         /// </summary>
@@ -19,7 +19,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models
         [JsonProperty("create_time")]
         public long CraeteTime { get; set; }
         [JsonProperty("creator_tiny_id")]
-        public long CreatorTinyId { get; set; }
+        public string? CreatorTinyId { get; set; }
         [JsonProperty("talk_permission")]
         public int TalkPermission { get; set; }
         [JsonProperty("visible_type")]

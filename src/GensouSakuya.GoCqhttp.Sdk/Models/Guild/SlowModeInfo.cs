@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace GensouSakuya.GoCqhttp.Sdk.Models
+namespace GensouSakuya.GoCqhttp.Sdk.Models.Guild
 {
     public class SlowModeInfo
     {

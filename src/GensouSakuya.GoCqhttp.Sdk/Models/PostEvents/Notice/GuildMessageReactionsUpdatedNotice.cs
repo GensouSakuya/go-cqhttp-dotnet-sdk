@@ -1,4 +1,5 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
+﻿using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

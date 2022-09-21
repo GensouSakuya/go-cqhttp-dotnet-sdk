@@ -14,6 +14,11 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Base
         [JsonProperty("status")]
         public string? Status { get; set; }
 
+        [JsonProperty("msg")]
+        public string? Msg { get; set; }
+        [JsonProperty("wording")]
+        public string? Wording { get; set; }
+
         public bool IsSuccess => Retcode == 0;
     }
 

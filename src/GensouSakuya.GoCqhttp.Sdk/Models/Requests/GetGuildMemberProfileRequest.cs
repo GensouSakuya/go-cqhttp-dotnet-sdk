@@ -2,17 +2,17 @@
 
 namespace GensouSakuya.GoCqhttp.Sdk.Models.Requests
 {
-    public class GetGuildMemberProfileRequest
+    internal class GetGuildMemberProfileRequest
     {
-        public GetGuildMemberProfileRequest(long guildId, long tinyId)
+        public GetGuildMemberProfileRequest(string? guildId, string? tinyId)
         {
             GuildId = guildId;
             TinyId = tinyId;
         }
 
         [JsonProperty("guild_id")]
-        public long GuildId { get; set; }
+        public string? GuildId { get; set; }
         [JsonProperty("user_id")]
-        public long TinyId { get; set; }
+        public string? TinyId { get; set; }
     }
 }
