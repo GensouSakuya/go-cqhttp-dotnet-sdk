@@ -29,5 +29,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
 
         [JsonProperty("sender")]
         public object? Sender { get; set; }
+
+
     }
 }
