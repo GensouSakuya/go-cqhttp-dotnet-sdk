@@ -8,10 +8,10 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Message
     public class GuildMessage : MessagePost
     {
         [JsonProperty("guild_id")]
-        public long GuildId { get; set; }
+        public string? GuildId { get; set; }
 
         [JsonProperty("channel_id")]
-        public long ChannelId { get; set; }
+        public string? ChannelId { get; set; }
 
         public long TinyId => UserId;
     }
