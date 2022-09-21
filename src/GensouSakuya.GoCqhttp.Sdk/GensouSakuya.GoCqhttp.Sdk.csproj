@@ -4,6 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
     <Description>a sdk of go-cqhttp</Description>
+    <RepositoryUrl>https://github.com/GensouSakuya/go-cqhttp-dotnet-sdk</RepositoryUrl>
+    <RepositoryType>github</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
