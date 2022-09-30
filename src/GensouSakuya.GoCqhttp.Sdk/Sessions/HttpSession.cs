@@ -1,4 +1,5 @@
 ﻿using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
+using GensouSakuya.GoCqhttp.Sdk.Models.Responses;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             throw new NotImplementedException();
         }
 
-        public override Task<List<GuildMemberInfo>> GetGuildMemberList(string guildId, string nextToken)
+        public override Task<GetGuildMemberListResponse> GetGuildMemberList(string guildId, string nextToken)
         {
             throw new NotImplementedException();
         }

@@ -6,6 +6,12 @@
     <Description>a sdk of go-cqhttp</Description>
     <RepositoryUrl>https://github.com/GensouSakuya/go-cqhttp-dotnet-sdk</RepositoryUrl>
     <RepositoryType>github</RepositoryType>
+    <Company>GensouSakuya.GoCqhttp.Sdk</Company>
+    <Product>GensouSakuya.GoCqhttp.Sdk</Product>
+    <Authors>GensouSakuya</Authors>
+    <Version>0.3.1-dev2</Version>
+    <PackageId>GensouSakuya.GoCqhttp.Sdk</PackageId>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

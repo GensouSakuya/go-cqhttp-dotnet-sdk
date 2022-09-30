@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
+using GensouSakuya.GoCqhttp.Sdk.Models.Responses;
 
 namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 {
@@ -14,7 +15,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 
         public abstract Task<List<ChannelInfo>?> GetGuildChannelList(string guildId, bool noCache);
 
-        public abstract Task<List<GuildMemberInfo>> GetGuildMemberList(string guildId, string nextToken);
+        public abstract Task<GetGuildMemberListResponse> GetGuildMemberList(string guildId, string nextToken);
 
         public abstract Task<GuildMemberInfo?> GetGuildMemberProfile(string guildId, string tinyId);
 
