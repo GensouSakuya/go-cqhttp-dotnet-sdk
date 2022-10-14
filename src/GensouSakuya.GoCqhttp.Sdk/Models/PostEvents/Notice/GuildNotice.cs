@@ -6,12 +6,12 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models.PostEvents.Notice
     public abstract class GuildNotice:NoticePost
     {
         [JsonProperty("guild_id")]
-        public long GuildId { get; set; }
+        public string? GuildId { get; set; }
 
         [JsonProperty("channel_id")]
-        public long ChannelId { get; set; }
+        public string? ChannelId { get; set; }
 
         [JsonProperty("user_id")]
-        public long UserId { get; set; }
+        public string? UserId { get; set; }
     }
 }

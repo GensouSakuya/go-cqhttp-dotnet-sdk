@@ -13,6 +13,6 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Message
         [JsonProperty("channel_id")]
         public string? ChannelId { get; set; }
 
-        public long TinyId => UserId;
+        public string TinyId => UserId;
     }
 }

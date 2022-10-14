@@ -16,7 +16,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
         public string? MessageId { get; set; }
 
         [JsonProperty("user_Id")]
-        public long UserId { get; set; }
+        public string? UserId { get; set; }
 
         [JsonProperty("message")]
         public object? Message { get; set; }
