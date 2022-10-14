@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
 using System.Linq;
+using GensouSakuya.GoCqhttp.Sdk.Models.Responses;
 
 namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 {
@@ -138,10 +139,10 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             return res.Data;
         }
 
-        public override async Task<List<GuildMemberInfo>> GetGuildMemberList(string guildId, string nextToken)
+        public override async Task<GetGuildMemberListResponse> GetGuildMemberList(string guildId, string nextToken)
         {
-            var res = await SendAsync<ResponsePost<List<GuildMemberInfo>>>(new WebsocketRequest<GetGuildMemberListRequest>("get_guild_member_list", new GetGuildMemberListRequest(guildId, nextToken)));
-            return res.Data ?? Enumerable.Empty<GuildMemberInfo>().ToList();
+            var res = await SendAsync<ResponsePost<GetGuildMemberListResponse>>(new WebsocketRequest<GetGuildMemberListRequest>("get_guild_member_list", new GetGuildMemberListRequest(guildId, nextToken)));
+            return res.Data;
         }
 
         public override async Task<GuildMemberInfo?> GetGuildMemberProfile(string guildId, string tinyId)
