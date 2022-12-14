@@ -9,7 +9,7 @@
     <Company>GensouSakuya.GoCqhttp.Sdk</Company>
     <Product>GensouSakuya.GoCqhttp.Sdk</Product>
     <Authors>GensouSakuya</Authors>
-    <Version>0.4.1-dev</Version>
+    <Version>0.4.2-dev</Version>
     <PackageId>GensouSakuya.GoCqhttp.Sdk</PackageId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>

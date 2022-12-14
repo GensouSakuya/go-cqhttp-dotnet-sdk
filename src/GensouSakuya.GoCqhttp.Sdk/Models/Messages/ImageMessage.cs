@@ -7,7 +7,15 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models.Messages
     [CQ("image")]
     public class ImageMessage:BaseMessage
     {
-        public ImageMessage() { }
+        public ImageMessage(string? file, int subType, string? url)
+        {
+            this.File = file;
+            this.SubType = subType;
+            this.Url = url;
+        }
+
+        internal ImageMessage() { }
+
         /// <summary>
         /// 图片路径必须为与Go-cqhttp的相对路径
         /// </summary>
