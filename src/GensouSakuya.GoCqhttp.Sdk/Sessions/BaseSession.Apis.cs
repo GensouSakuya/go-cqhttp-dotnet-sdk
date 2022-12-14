@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GensouSakuya.GoCqhttp.Sdk.Models.Group;
 using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
 using GensouSakuya.GoCqhttp.Sdk.Models.Responses;
 
@@ -7,6 +8,22 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 {
     public partial class BaseSession
     {
+        /// <summary>
+        /// 发送私聊消息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="message"></param>
+        /// <param name="autoEscape"></param>
+        /// <param name="tempFromGroupId">主动发起临时会话的来源群号</param>
+        /// <returns></returns>
+        public abstract Task<string> SendPrivateMessage(string userId, string message, bool autoEscape = false, string? tempFromGroupId = null);
+
+        #region Group
+        public abstract Task<List<GroupMemberInfo>> GetGroupMemberList(string groupId, bool noCache = true);
+        public abstract Task<string> SendGroupMessage(string groupId, string message, bool autoEscape = false);
+        #endregion
+
+        #region Guild
         public abstract Task<GuildProfile?> GetGuildServiceProfile();
 
         public abstract Task<List<GuildInfo>?> GetGuildList();
@@ -32,5 +49,6 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
         public abstract Task UpdateGuildRole(string guildId, string roleId, string name, string color, bool independent);
 
         public abstract Task<string> CreateGuildRole(string guildId, string color, string name, bool independent, List<string> initialUsers);
+        #endregion
     }
 }

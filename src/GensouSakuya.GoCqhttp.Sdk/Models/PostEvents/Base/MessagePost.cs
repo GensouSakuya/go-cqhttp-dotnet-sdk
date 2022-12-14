@@ -1,5 +1,9 @@
-﻿using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
+﻿using GensouSakuya.GoCqhttp.Sdk.Drivers.Messages;
+using GensouSakuya.GoCqhttp.Sdk.Models.Messages;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
 {
@@ -30,6 +34,18 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
         [JsonProperty("sender")]
         public object? Sender { get; set; }
 
-
+        private IEnumerable<BaseMessage>? _messageChain;
+        public IEnumerable<BaseMessage> MessageChain
+        {
+            get
+            {
+                if (_messageChain == null)
+                    _messageChain = MessageChainConverter.ConvertToChain(RawMessage);
+                return _messageChain;
+            }
+            internal set {
+                _messageChain = value; 
+            }
+        }
     }
 }

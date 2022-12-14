@@ -8,7 +8,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Message
     public class GroupMessage : MessagePost
     {
         [JsonProperty("group_id")]
-        public long GroupId { get; set; }
+        public string GroupId { get; set; }
 
         [JsonProperty("anonymous")]
         public object? Anonymous { get; set; }

@@ -30,8 +30,10 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
         }
 
 
-        protected async Task InvokeHandler(Post post)
+        protected async Task InvokeHandler(Post? post)
         {
+            if(post == null)
+                return;
             var postType = post.GetType();
             if (_handlerResolverMaps.ContainsKey(postType))
             {

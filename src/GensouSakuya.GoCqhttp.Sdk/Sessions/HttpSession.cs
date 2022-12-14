@@ -5,6 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using GensouSakuya.GoCqhttp.Sdk.Models.Requests;
+using GensouSakuya.GoCqhttp.Sdk.Models.Group;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 {
@@ -13,7 +18,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
         private Uri _httpUri;
         private RestClient _httpClient;
 
-        public HttpSession(string host, int port, string accessToken, bool useSsl = false) : base(host, port, accessToken, useSsl)
+        public HttpSession(string host, int port, string accessToken, bool useSsl = false, ILogger? logger = null) : base(host, port, accessToken, useSsl, logger)
         {
             var httpScheme = UseSsl ? "https" : "http";
             _httpUri = new Uri($"{httpScheme}://{Host}:{Port}");
@@ -41,6 +46,11 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             {
                 _httpClient.Dispose();
             }
+        }
+
+        public override Task<List<GroupMemberInfo>> GetGroupMemberList(string groupId, bool noCache = true)
+        {
+            return SendGet<List<GroupMemberInfo>>("/get_group_member_list", new GetGroupMemberListRequest(groupId,noCache));
         }
 
         public override Task<List<ChannelInfo>?> GetGuildChannelList(string guildId, bool noCache)
@@ -89,9 +99,21 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             throw new NotImplementedException();
         }
 
+        public override async Task<string> SendGroupMessage(string groupId, string message, bool autoEscape)
+        {
+            var res = await SendPost<SendMessageResponse>("/send_group_msg", new SendGroupMessageRequest(groupId, message, autoEscape));
+            return res.MessageId;
+        }
+
         public override Task<string?> SendGuildChannelMsg(string guildId, string channelId, string msg)
         {
             throw new NotImplementedException();
+        }
+
+        public override async Task<string> SendPrivateMessage(string userId, string message, bool autoEscape = false, string? tempFromGroupId = null)
+        {
+            var res = await SendPost<SendMessageResponse>("/send_private_msg", new SendPrivateMessageRequest(userId, tempFromGroupId, message, autoEscape));
+            return res.MessageId;
         }
 
         public override Task SetGuildMemberRole(string guildId, bool set, string roleId, List<string> users)
@@ -102,6 +124,35 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
         public override Task UpdateGuildRole(string guildId, string roleId, string name, string color, bool independent)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<TRes> SendPost<TRes>(string path, object body) where TRes: class
+        {
+            var request = new RestRequest(path);
+            request.Method = Method.Post;
+            request.AddJsonBody(body);
+            var response = await _httpClient.ExecuteAsync<TRes>(request);
+            response.ThrowIfError();
+            return response.Data;
+        }
+
+        private async Task<TRes> SendGet<TRes>(string path, object param) where TRes : class
+        {
+            var request = new RestRequest(path);
+            request.Method = Method.Get;
+            if(param != null)
+            {
+                var jobj = JObject.FromObject(param);
+                foreach(var token in jobj.Children())
+                {
+                    var name = token.Path;
+                    var value = token.Values().FirstOrDefault()?.ToString();
+                    request.AddParameter(name, value);
+                }
+            }
+            var response = await _httpClient.ExecuteAsync<TRes>(request);
+            response.ThrowIfError();
+            return response.Data;
         }
     }
 }

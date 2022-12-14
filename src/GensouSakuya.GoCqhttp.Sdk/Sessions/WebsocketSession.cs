@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
 using GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base;
 using Newtonsoft.Json;
 using Websocket.Client;
@@ -11,8 +10,10 @@ using GensouSakuya.GoCqhttp.Sdk.Models.Requests;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using GensouSakuya.GoCqhttp.Sdk.Models.Guild;
-using System.Linq;
 using GensouSakuya.GoCqhttp.Sdk.Models.Responses;
+using Microsoft.Extensions.Logging;
+using GensouSakuya.GoCqhttp.Sdk.Sessions.Drivers.Events;
+using GensouSakuya.GoCqhttp.Sdk.Models.Group;
 
 namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 {
@@ -22,7 +23,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
         private WebsocketClient _wsClient;
         private ConcurrentDictionary<string, TaskCompletionSource<string>> _responseDic;
 
-        public WebsocketSession(string host, int port, string accessToken, bool useSsl = false) : base(host, port, accessToken, useSsl)
+        public WebsocketSession(string host, int port, string accessToken, bool useSsl = false, ILogger? logger = null) : base(host, port, accessToken, useSsl, logger)
         {
             var wsScheme = UseSsl ? "wss" : "ws";
             _wsUri = new Uri($"{wsScheme}://{Host}:{Port}");
@@ -33,31 +34,39 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 
         protected async Task MessageReceived(ResponseMessage msg)
         {
-#if DEBUG
-            Console.WriteLine(msg.Text);
-#endif
-            var jobj = JObject.Parse(msg.Text);
-            if (jobj[Post.TypePropertyName] != null)
+            try
             {
-                var postType = jobj[Post.TypePropertyName].ToString();
-                var subTypePropertyName = EventResolver.GetSubTypePropertyName(postType);
-                if (jobj[subTypePropertyName] != null)
+                Logger?.LogTrace("[Trace][Message]{0}", msg.Text);
+                var jobj = JObject.Parse(msg.Text);
+                var postTypeName = jobj[Post.TypePropertyName]?.ToString();
+                if (postTypeName != null)
                 {
-                    var subType = jobj[subTypePropertyName].ToString();
-                    var type = EventResolver.GetPostType(postType, subType);
-                    var post = (Post)jobj.ToObject(type);
-                    await InvokeHandler(post);
+                    var subTypePropertyName = EventResolver.GetSubTypePropertyName(postTypeName);
+                    var subType = jobj[subTypePropertyName]?.ToString();
+                    if (subType != null)
+                    {
+                        var type = EventResolver.GetPostType(postTypeName, subType);
+                        var post = (Post?)jobj.ToObject(type);
+                        if(!(post is MetaEventPost))
+                        {
+                            Logger?.LogDebug("[Debug][Receive]{0}", msg.Text);
+                        }
+                        await InvokeHandler(post);
+                        return;
+                    }
+                    throw new Exception($"json has no sub type, json:{jobj}");
+                }
+                else if (jobj[ResponsePost.MainPropertyName]?.ToString() is string echo)
+                {
+                    ProcessResponse(echo, msg.Text);
                     return;
                 }
-                throw new Exception($"json has no sub type, json:{jobj}");
+                throw new Exception($"json has no valid property type, json:{jobj}");
             }
-            else if (jobj[ResponsePost.MainPropertyName] != null)
+            catch(Exception e)
             {
-                var echo = jobj[ResponsePost.MainPropertyName].ToString();
-                ProcessResponse(echo,msg.Text);
-                return;
+                Logger?.LogError(e, "message process error, origin message:{0}", msg?.Text);
             }
-            throw new Exception($"json has no valid property type, json:{jobj}");
         }
 
         public override async Task ConnectAsync(CancellationToken cancellationToken = default)
@@ -74,7 +83,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             }
         }
 
-        private async Task<TData> SendAsync<TData>(WebsocketRequest req) where TData : ResponsePost
+        private async Task<TData> SendAsync<TData>(WebsocketRequest req) where TData : class
         {
             try
             {
@@ -83,7 +92,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
                 var request = JsonConvert.SerializeObject(req);
                 _wsClient.Send(request);
                 var resJson = await completionSource.Task;
-                var res = JsonConvert.DeserializeObject<TData>(resJson);
+                var res = JsonConvert.DeserializeObject<ResponsePost<TData>>(resJson);
                 if(res == null)
                 {
                     throw new Exception("response is null");
@@ -92,7 +101,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
                 {
                     throw new Exception($"{res.Msg}:{res.Wording}");
                 }
-                return res;
+                return res.Data;
             }
             finally
             {
@@ -115,79 +124,86 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             }
         }
 
-        public override async Task<GuildProfile?> GetGuildServiceProfile()
+        public override Task<GuildProfile> GetGuildServiceProfile()
         {
-            var res = await SendAsync<ResponsePost<GuildProfile>>(new WebsocketRequest("get_guild_service_profile"));
-            return res.Data;
+            return SendAsync<GuildProfile>(new WebsocketRequest("get_guild_service_profile"));
         }
 
-        public override async Task<List<GuildInfo>?> GetGuildList()
+        public override Task<List<GuildInfo>> GetGuildList()
         {
-            var res = await SendAsync<ResponsePost<List<GuildInfo>>>(new WebsocketRequest("get_guild_list"));
-            return res.Data;
+            return SendAsync<List<GuildInfo>>(new WebsocketRequest("get_guild_list"));
         }
 
-        public override async Task<GuildGuestMeta?> GetGuildMetaByGuest(string guildId)
+        public override Task<GuildGuestMeta> GetGuildMetaByGuest(string guildId)
         {
-            var res = await SendAsync<ResponsePost<GuildGuestMeta>>(new WebsocketRequest<GetGuildMetaByGuestRequest>("get_guild_meta_by_guest", new GetGuildMetaByGuestRequest(guildId)));
-            return res.Data;
+            return SendAsync<GuildGuestMeta>(new WebsocketRequest<GetGuildMetaByGuestRequest>("get_guild_meta_by_guest", new GetGuildMetaByGuestRequest(guildId)));
         }
 
-        public override async Task<List<ChannelInfo>?> GetGuildChannelList(string guildId, bool noCache)
+        public override Task<List<ChannelInfo>> GetGuildChannelList(string guildId, bool noCache)
         {
-            var res = await SendAsync<ResponsePost<List<ChannelInfo>>>(new WebsocketRequest<GetGuildChannelListRequest>("get_guild_channel_list", new GetGuildChannelListRequest(guildId, noCache)));
-            return res.Data;
+            return SendAsync<List<ChannelInfo>>(new WebsocketRequest<GetGuildChannelListRequest>("get_guild_channel_list", new GetGuildChannelListRequest(guildId, noCache)));
         }
 
-        public override async Task<GetGuildMemberListResponse> GetGuildMemberList(string guildId, string nextToken)
+        public override Task<GetGuildMemberListResponse> GetGuildMemberList(string guildId, string nextToken)
         {
-            var res = await SendAsync<ResponsePost<GetGuildMemberListResponse>>(new WebsocketRequest<GetGuildMemberListRequest>("get_guild_member_list", new GetGuildMemberListRequest(guildId, nextToken)));
-            return res.Data;
+            return SendAsync<GetGuildMemberListResponse>(new WebsocketRequest<GetGuildMemberListRequest>("get_guild_member_list", new GetGuildMemberListRequest(guildId, nextToken)));
         }
 
-        public override async Task<GuildMemberInfo?> GetGuildMemberProfile(string guildId, string tinyId)
+        public override Task<GuildMemberInfo> GetGuildMemberProfile(string guildId, string tinyId)
         {
-            var res = await SendAsync<ResponsePost<GuildMemberInfo>>(new WebsocketRequest<GetGuildMemberProfileRequest>("get_guild_member_profile", new GetGuildMemberProfileRequest(guildId, tinyId)));
-            return res.Data;
+            return SendAsync<GuildMemberInfo>(new WebsocketRequest<GetGuildMemberProfileRequest>("get_guild_member_profile", new GetGuildMemberProfileRequest(guildId, tinyId)));
         }
 
-        public override async Task<string?> SendGuildChannelMsg(string guildId, string channelId, string msg)
+        public override Task<string> SendGuildChannelMsg(string guildId, string channelId, string msg)
         {
-            var res = await SendAsync<ResponsePost<string>>(new WebsocketRequest<SendGuildChannelMsgRequest>("send_guild_channel_msg", new SendGuildChannelMsgRequest(guildId, channelId, msg)));
-            return res.Data;
+            return SendAsync<string>(new WebsocketRequest<SendGuildChannelMsgRequest>("send_guild_channel_msg", new SendGuildChannelMsgRequest(guildId, channelId, msg)));
         }
 
-        public override async Task<List<FeedInfo>?> GetTopicChannelFeeds(string guildId, string channelId)
+        public override Task<List<FeedInfo>> GetTopicChannelFeeds(string guildId, string channelId)
         {
-            var res = await SendAsync<ResponsePost<List<FeedInfo>>>(new WebsocketRequest<GetTopicChannelFeedsRequest>("get_topic_channel_feeds", new GetTopicChannelFeedsRequest(guildId, channelId)));
-            return res.Data;
+            return SendAsync<List<FeedInfo>>(new WebsocketRequest<GetTopicChannelFeedsRequest>("get_topic_channel_feeds", new GetTopicChannelFeedsRequest(guildId, channelId)));
         }
 
-        public override async Task DeleteGuildRole(string guildId, string roleId)
+        public override Task DeleteGuildRole(string guildId, string roleId)
         {
-            await SendAsync(new WebsocketRequest<DeleteGuildRoleRequest>("delete_guild_role", new DeleteGuildRoleRequest(guildId, roleId)));
+            return SendAsync(new WebsocketRequest<DeleteGuildRoleRequest>("delete_guild_role", new DeleteGuildRoleRequest(guildId, roleId)));
         }
 
-        public override async Task<List<RoleInfo>> GetGuildRoles(string guildId)
+        public override Task<List<RoleInfo>> GetGuildRoles(string guildId)
         {
-            var res = await SendAsync<ResponsePost<List<RoleInfo>>>(new WebsocketRequest<GetGuildRolesRequest>("get_topic_channel_feeds", new GetGuildRolesRequest(guildId)));
-            return res.Data ?? Enumerable.Empty<RoleInfo>().ToList();
+            return SendAsync<List<RoleInfo>>(new WebsocketRequest<GetGuildRolesRequest>("get_topic_channel_feeds", new GetGuildRolesRequest(guildId)));
         }
 
-        public override async Task SetGuildMemberRole(string guildId, bool set, string roleId, List<string> users)
+        public override Task SetGuildMemberRole(string guildId, bool set, string roleId, List<string> users)
         {
-            await SendAsync(new WebsocketRequest<SetGuildMemberRoleRequest>("set_guild_member_role", new SetGuildMemberRoleRequest(guildId, set, roleId, users)));
+            return SendAsync(new WebsocketRequest<SetGuildMemberRoleRequest>("set_guild_member_role", new SetGuildMemberRoleRequest(guildId, set, roleId, users)));
         }
 
-        public override async Task UpdateGuildRole(string guildId, string roleId, string name, string color, bool independent)
+        public override Task UpdateGuildRole(string guildId, string roleId, string name, string color, bool independent)
         {
-            await SendAsync(new WebsocketRequest<UpdateGuildRoleRequest>("update_guild_role", new UpdateGuildRoleRequest(guildId, roleId, name, color, independent)));
+            return SendAsync(new WebsocketRequest<UpdateGuildRoleRequest>("update_guild_role", new UpdateGuildRoleRequest(guildId, roleId, name, color, independent)));
         }
 
-        public override async Task<string> CreateGuildRole(string guildId, string color, string name, bool independent, List<string> initialUsers)
+        public override Task<string> CreateGuildRole(string guildId, string color, string name, bool independent, List<string> initialUsers)
         {
-            var res = await SendAsync<ResponsePost<string>>(new WebsocketRequest<CreateGuildRoleRequest>("create_guild_role", new CreateGuildRoleRequest(guildId, color, name, independent, initialUsers)));
-            return res.Data;
+            return SendAsync<string>(new WebsocketRequest<CreateGuildRoleRequest>("create_guild_role", new CreateGuildRoleRequest(guildId, color, name, independent, initialUsers)));
+        }
+
+        public override async Task<string> SendGroupMessage(string groupId, string message, bool autoEscape = false)
+        {
+            var res = await SendAsync<SendMessageResponse>(new WebsocketRequest<SendGroupMessageRequest>("send_group_msg", new SendGroupMessageRequest(groupId, message, autoEscape)));
+            return res.MessageId;
+        }
+
+        public override async Task<string> SendPrivateMessage(string userId, string message, bool autoEscape = false, string? tempFromGroupId = null)
+        {
+            var res = await SendAsync<SendMessageResponse>(new WebsocketRequest<SendPrivateMessageRequest>("send_private_msg", new SendPrivateMessageRequest(userId, tempFromGroupId, message, autoEscape)));
+            return res.MessageId;
+        }
+
+        public override Task<List<GroupMemberInfo>> GetGroupMemberList(string groupId, bool noCache = true)
+        {
+            return SendAsync<List<GroupMemberInfo>>(new WebsocketRequest<GetGroupMemberListRequest>("get_group_member_list", new GetGroupMemberListRequest(groupId, noCache)));
         }
     }
 }
