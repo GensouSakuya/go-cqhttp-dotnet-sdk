@@ -32,7 +32,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
         public int Font { get; set; }
 
         [JsonProperty("sender")]
-        public object? Sender { get; set; }
+        public dynamic Sender { get; set; }
 
         private IEnumerable<BaseMessage>? _messageChain;
         public IEnumerable<BaseMessage> MessageChain
