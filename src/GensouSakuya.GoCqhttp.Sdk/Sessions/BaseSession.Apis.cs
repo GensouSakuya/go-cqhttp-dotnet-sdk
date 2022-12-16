@@ -36,7 +36,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
 
         public abstract Task<GuildMemberInfo?> GetGuildMemberProfile(string guildId, string tinyId);
 
-        public abstract Task<string?> SendGuildChannelMsg(string guildId, string channelId, string msg);
+        public abstract Task<string> SendGuildChannelMsg(string guildId, string channelId, string msg);
 
         public abstract Task<List<FeedInfo>?> GetTopicChannelFeeds(string guildId, string channelId);
 

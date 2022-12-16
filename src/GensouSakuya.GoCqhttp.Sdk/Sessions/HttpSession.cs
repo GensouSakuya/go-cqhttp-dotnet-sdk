@@ -105,9 +105,10 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             return res.MessageId;
         }
 
-        public override Task<string?> SendGuildChannelMsg(string guildId, string channelId, string msg)
+        public override async Task<string> SendGuildChannelMsg(string guildId, string channelId, string msg)
         {
-            throw new NotImplementedException();
+            var res = await SendPost<SendMessageResponse>("/send_guild_channel_msg", new SendGuildChannelMsgRequest(guildId, channelId, msg));
+            return res.MessageId;
         }
 
         public override async Task<string> SendPrivateMessage(string userId, string message, bool autoEscape = false, string? tempFromGroupId = null)

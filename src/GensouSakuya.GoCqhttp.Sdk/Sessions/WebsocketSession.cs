@@ -154,9 +154,10 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions
             return SendAsync<GuildMemberInfo>(new WebsocketRequest<GetGuildMemberProfileRequest>("get_guild_member_profile", new GetGuildMemberProfileRequest(guildId, tinyId)));
         }
 
-        public override Task<string> SendGuildChannelMsg(string guildId, string channelId, string msg)
+        public override async Task<string> SendGuildChannelMsg(string guildId, string channelId, string msg)
         {
-            return SendAsync<string>(new WebsocketRequest<SendGuildChannelMsgRequest>("send_guild_channel_msg", new SendGuildChannelMsgRequest(guildId, channelId, msg)));
+            var res = await SendAsync<SendMessageResponse>(new WebsocketRequest<SendGuildChannelMsgRequest>("send_guild_channel_msg", new SendGuildChannelMsgRequest(guildId, channelId, msg)));
+            return res.MessageId;
         }
 
         public override Task<List<FeedInfo>> GetTopicChannelFeeds(string guildId, string channelId)
