@@ -10,15 +10,15 @@ namespace GensouSakuya.GoCqhttp.Sdk.Drivers.Messages
     {
         public static IEnumerable<BaseMessage> ConvertToChain(string? rawMessage)
         {
-            if(rawMessage == null)
+            if (rawMessage == null)
                 return Enumerable.Empty<BaseMessage>();
             var chain = new List<BaseMessage>();
-            for(var i = 0;i < rawMessage.Length;i++)
+            for (var i = 0; i < rawMessage.Length; i++)
             {
                 var j = i;
-                if (rawMessage[i] == '[' && rawMessage[i+1] == 'C' && rawMessage[i + 2] == 'Q')
+                if (rawMessage[i] == '[' && rawMessage[i + 1] == 'C' && rawMessage[i + 2] == 'Q')
                 {
-                    for(; j < rawMessage.Length; j++)
+                    for (; j < rawMessage.Length; j++)
                     {
                         if (rawMessage[j] == ']')
                         {

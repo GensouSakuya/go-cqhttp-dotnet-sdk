@@ -40,7 +40,7 @@ namespace GensouSakuya.GoCqhttp.Sdk.Sessions.Models.PostEvents.Base
             get
             {
                 if (_messageChain == null)
-                    _messageChain = MessageChainConverter.ConvertToChain(RawMessage);
+                    _messageChain = MessageChainConverter.ConvertToChain(RawMessage ?? Message?.ToString());
                 return _messageChain;
             }
             internal set {
