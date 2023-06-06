@@ -30,13 +30,19 @@ namespace GensouSakuya.GoCqhttp.Sdk.Drivers.Messages
                 }
                 else
                 {
+                    var isloopFinishEarly = false;
                     for (; j < rawMessage.Length; j++)
                     {
                         if (rawMessage[j] == '[')
+                        {
+                            isloopFinishEarly = true;
                             break;
+                        }
                     }
                     var textMsg = rawMessage.Substring(i, j - i);
                     chain.Add(new TextMessage(textMsg));
+                    if (isloopFinishEarly)
+                        j--;
                 }
                 i = j;
             }
