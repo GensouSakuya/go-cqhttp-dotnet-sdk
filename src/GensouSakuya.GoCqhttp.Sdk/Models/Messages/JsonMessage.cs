@@ -8,10 +8,14 @@ namespace GensouSakuya.GoCqhttp.Sdk.Models.Messages
     [CQ("json")]
     public class JsonMessage : BaseMessage
     {
-        public JsonMessage(string json)
+        public JsonMessage(string json) : this()
         {
             Data = json;
-            _dataNCRDecorded = new Lazy<string>(()=> WebUtility.HtmlDecode(Data));
+        }
+
+        internal JsonMessage()
+        {
+            _dataNCRDecorded = new Lazy<string>(() => WebUtility.HtmlDecode(Data));
         }
 
         public string? Data { get; set; }
